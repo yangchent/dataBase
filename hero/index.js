@@ -67,5 +67,35 @@ app.post("/heroes_power", async (req,res)=> {
 		message: "success",
 })
 });
-
+app.get('/heroes/:name', async (req, res)=> {
+    const hero= req.params.name;
+    let heroDetail;
+    try{
+        heroDetail = await Postgres.query("SELECT * FROM heroes WHERE name=$1", [hero])
+    }catch(err){
+        return res.status(400).json({
+            message: "Error"
+        })
+    }
+      res.json({
+          status : 'ok',
+          data: heroDetail.rows,
+      })
+    });
+    app.get('/heroes/:name/power', async (req, res) =>{
+        const hero= req.params.name;
+        let heroPower;
+        try{
+            heroPower = await Postgres.query(
+                "SELECT powers.name,heroes.name FROM powers INNER JOIN heroes_power ON powers.id = heroes_power.power_id INNER JOIN heroes ON heroes.id=heroes_power.heroes_id WHERE name='Thor'; WHERE name=$1", [hero])
+        }catch(err){
+            return res.status(400).json({
+                message: "Error"
+            })
+        }
+      res.json({
+          status : 'ok',
+          data: heroDetail.rows,
+      })
+    });
 app.listen(5432, () => console.log("Listening to port "));
